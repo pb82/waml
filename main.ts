@@ -21,7 +21,7 @@ function readFromStream(stream): Promise<any> {
     return new Promise((resolve, reject) => {
         const data = [];
         stream.resume();
-        stream.setEncoding("utg-8");
+        stream.setEncoding("utf-8");
         stream.on("data", (chunk) => {
             data.push(chunk);
         });

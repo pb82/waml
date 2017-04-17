@@ -5,7 +5,6 @@
   "compilerOptions": {
     "target": "es5",
     "removeComments": true,
-    "sourceRoot": "./",
     "typeRoots": [
       "node_modules/@types"
     ]

@@ -4,6 +4,7 @@
   "description": "Web Audio Markup Language",
   "main": "index.js",
   "scripts": {
+    "compile": "tsc",
     "start": "node main.js"
   },
   "author": "Peter Braun",
