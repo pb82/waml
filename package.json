@@ -1,0 +1,23 @@
+{
+  "name": "waml",
+  "version": "0.0.1",
+  "description": "Web Audio Markup Language",
+  "main": "index.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "author": "Peter Braun",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bluebird": "^3.5.2",
+    "@types/commander": "^2.3.31",
+    "@types/node": "^7.0.12",
+    "@types/winston": "^2.3.0",
+    "tslint": "^5.1.0",
+    "typescript": "^2.2.2"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "commander": "^2.9.0"
+  }
+}

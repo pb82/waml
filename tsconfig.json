@@ -1,0 +1,13 @@
+{
+  "sourceMap": true,
+  "inlineSources": true,
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "es5",
+    "removeComments": true,
+    "sourceRoot": "./",
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  }
+}

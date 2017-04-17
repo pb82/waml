@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Audio test</title>
+</head>
+
+<body id="home">
+
+<h1>Audio</h1>
+
+<script>
+    function Audio(){
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var a = audioCtx["createOscillator"]();
+        a.frequency.value = 440;
+        this.set_a_frequncy = function(f){
+            a.frequency.value = f;
+        }
+
+        a.start();
+        var b = audioCtx["createOscillator"]();
+        b.frequency.value = 2000;
+        this.set_b_frequncy = function(f){
+            b.frequency.value = f;
+        }
+
+        b.start();
+
+        this.start_a = function(){
+            a.connect(audioCtx.destination);
+        };
+        this.stop_a = function(){
+            a.disconnect();
+        };
+        this.start_b = function(){
+            b.connect(audioCtx.destination);
+        };
+        this.stop_b = function(){
+            b.disconnect();
+        };
+
+    }
+</script>
+
+</body>
+</html>

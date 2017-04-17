@@ -1,0 +1,8 @@
+Constant frequency {
+  value: (2*@sin(@cos(5)))+1
+}
+
+Oscillator a {
+  frequency: 2*frequency*@pi,
+  type: "sine"
+} export
