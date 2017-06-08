@@ -26,4 +26,8 @@ export class ExpressionWriter implements Writer {
     public write(): string {
         return this.expression.join("");
     }
+
+    public reset(): void {
+        this.expression = [];
+    }
 }

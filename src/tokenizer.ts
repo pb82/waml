@@ -10,6 +10,8 @@ export enum TOKEN_TYPE {
     RPAREN,
     LBRACKET,
     RBRACKET,
+    LSQUARE,
+    RSQUARE,
     COMMA,
     ARROW,
     COLON,
@@ -29,6 +31,8 @@ const TOKEN_CHAR_MAPPING = {
     ")": TOKEN_TYPE.RPAREN,
     "{": TOKEN_TYPE.LBRACKET,
     "}": TOKEN_TYPE.RBRACKET,
+    "[": TOKEN_TYPE.LSQUARE,
+    "]": TOKEN_TYPE.RSQUARE,
     ":": TOKEN_TYPE.COLON,
     ",": TOKEN_TYPE.COMMA,
     ">": TOKEN_TYPE.ARROW,
@@ -67,6 +71,7 @@ export class Token {
 export class TokenProvider {
     private tokens: Token[];
     private index: number = 0;
+    private indexStack: number[] = [];
 
     constructor(tokens: Token[]) {
         this.tokens = tokens;
@@ -122,13 +127,24 @@ export class TokenProvider {
         }
         throw new UnexpectedTokenError(token);
     }
+
+    public pushState(): void {
+        this.indexStack.push(this.index);
+    }
+
+    public restoreState(): void {
+        if (this.indexStack.length === 0) {
+            throw new Error("Parse index corruption");
+        }
+
+        this.index = this.indexStack.pop();
+    }
 }
 
 /**
  * Classifies tokens by the shape of their value and sets the
- * `type` property of the Token class.
- * It can distinguish between strings, numbers, control characters,
- * classes (Uppercoase IDs) and names (lowercase IDs)
+ * `type` property of the Token class. It can distinguish between strings,
+ * numbers, control characters, classes (Uppercoase IDs) and names (lowercase IDs)
  */
 export class Analyzer {
     private rawTokens: Token[];

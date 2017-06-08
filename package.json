@@ -15,10 +15,11 @@
     "@types/node": "^7.0.12",
     "@types/winston": "^2.3.0",
     "tslint": "^5.1.0",
-    "typescript": "^2.2.2"
+    "typescript": "2.2.2"
   },
   "dependencies": {
     "bluebird": "^3.5.0",
-    "commander": "^2.9.0"
+    "commander": "^2.9.0",
+    "winston": "^2.3.1"
   }
 }

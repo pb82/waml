@@ -22,7 +22,7 @@ export class JavascriptWriter implements Writer {
         if (!name) {
             name = this.generateName(type);
         }
-        const code = `var ${name}=new ${this.ctx}[${type}]();`;
+        const code = `var ${name}=${this.ctx}["${type}"]();`;
         this.code.push(code);
         return name;
     }
@@ -49,15 +49,25 @@ export class JavascriptWriter implements Writer {
     }
 
     public writeStringProperty(parent: string, prop: string, value: string, direct: boolean = false): void {
-        const valueParam = (direct && ".value") || "";
+        const valueParam = (!direct && ".value") || "";
         const property = `${parent}.${prop}${valueParam}="${value}";`;
         this.code.push(property);
     }
 
     public writeGenericProperty(parent: string, prop: string, value: any, direct: boolean = false): void {
-        const valueParam = (direct && ".value") || "";
+        const valueParam = (!direct && ".value") || "";
         const property = `${parent}.${prop}${valueParam}=${value};`;
         this.code.push(property);
+    }
+
+    public writeGeneratePeriodicWave(name: string, real: string, img: string) {
+        const code = `var ${name}=${this.ctx}.createPeriodicWave(${real}, ${img});`;
+        this.code.push(code);
+    }
+
+    public writeSetPeriodicWave(target: string, wave: string) {
+        const code = `${target}.setPeriodicWave(${wave});`;
+        this.code.push(code);
     }
 
     public write(): string {
@@ -65,9 +75,13 @@ export class JavascriptWriter implements Writer {
         return format(boilerplate, this.code.join(""));
     }
 
+    public reset(): void {
+        this.code = [];
+    }
+
     private generateBoilerplate(): string {
         return `
-        (function(){
+        window.audio=new(function(){
             var ${this.ctx}=new (window.AudioContext || window.webkitAudioContext)();
             %s
         });

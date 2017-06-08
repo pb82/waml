@@ -1,9 +1,12 @@
+import {ArrayParser} from "./arrayparser";
+import {ArrayWriter} from "./arraywriter";
 import {AlreadyDefinedError, AnonymousExportError, UnexpectedTokenError, UnknownPropertyError} from "./exceptions";
 import {ExpressionParser} from "./expressionparser";
 import {ExpressionWriter} from "./expressionwriter";
 import {ASTNode, NamedNode} from "./interfaces/ast";
-import {ConstantNode, OscillatorNode} from "./nodes";
+import {ConstantNode, OscillatorNode, PeriodicWaveNode} from "./nodes";
 import {TOKEN_TYPE, TokenProvider} from "./tokenizer";
+import {ArrayExpressionParser} from "./arrayexpressionparser";
 
 const Keywords = {
     export: "export",
@@ -12,6 +15,7 @@ const Keywords = {
 const Constructors = {
     Oscillator: OscillatorNode,
     Constant: ConstantNode,
+    PeriodicWave: PeriodicWaveNode,
 };
 
 export class Parser {
@@ -52,6 +56,14 @@ export class Parser {
             this.tokens.expect(TOKEN_TYPE.COLON);
             if (target.METADATA[propertyName.value] === "string") {
                 target[propertyName.value] = this.tokens.expect(TOKEN_TYPE.STRING).value;
+            } else if (target.METADATA[propertyName.value] === "array") {
+                try {
+                    this.tokens.pushState();
+                    target[propertyName.value] = this.readArray(this.definitions);
+                } catch (_) {
+                    this.tokens.restoreState();
+                    target[propertyName.value] = this.readArrayExpression(this.definitions);
+                }
             } else {
                 target[propertyName.value] = this.readExpression(this.definitions);
             }
@@ -116,6 +128,20 @@ export class Parser {
         const expressionWriter = new ExpressionWriter();
         expressionParser.getAST().generateCode(expressionWriter);
         return expressionWriter.write();
+    }
+
+    private readArray(definedConstants: string[]): string {
+        const arrayParser = new ArrayParser(this.tokens, definedConstants);
+        const arrayWriter = new ArrayWriter();
+        arrayParser.getAST().generateCode(arrayWriter);
+        return arrayWriter.write();
+    }
+
+    private readArrayExpression(definedConstants: string[]): string {
+        const arrayParser = new ArrayExpressionParser(this.tokens, definedConstants);
+        const arrayWriter = new ArrayWriter();
+        arrayParser.getAST().generateCode(arrayWriter);
+        return arrayWriter.write();
     }
 
     private stageOne(): ASTNode {

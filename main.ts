@@ -46,6 +46,7 @@ function readFromFile(filename): Promise<any> {
 function errorHandler(err) {
     error("Compiler error");
     error(err.message || err.toString());
+    error(err.stack);
     process.exit(1);
 }
 

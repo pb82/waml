@@ -1,4 +1,5 @@
 import {ExpressionWriter} from "./expressionwriter";
+import {ArrayWriter} from "./arraywriter";
 import {ASTNode, NamedNode} from "./interfaces/ast";
 import {JavascriptWriter} from "./jswriter";
 
@@ -55,6 +56,48 @@ export class InnerExpressionNode implements ASTNode {
     }
 }
 
+export class ArrayNode implements ASTNode {
+    public items: ASTNode[] = [];
+
+    public generateCode(writer: ArrayWriter): void {
+        writer.beginArray();
+        const expressionWriter = new ExpressionWriter();
+        for (const item of this.items) {
+            item.generateCode(expressionWriter);
+            writer.writeGeneric(expressionWriter.write());
+            writer.writeGeneric(",");
+            expressionWriter.reset();
+        }
+        writer.endArray();
+    }
+}
+
+export class ArrayExpressionNode implements ASTNode {
+    public variable: string;
+    public from: ASTNode;
+    public to: ASTNode;
+    public body: ASTNode;
+
+    public generateCode(writer: ArrayWriter): void {
+        const expressionWriter = new ExpressionWriter();
+
+        this.from.generateCode(expressionWriter);
+        const from = expressionWriter.write();
+        expressionWriter.reset();
+
+        this.to.generateCode(expressionWriter);
+        const to = expressionWriter.write();
+        expressionWriter.reset();
+
+        this.body.generateCode(expressionWriter);
+        const body = expressionWriter.write();
+
+        writer.beginArrayExpression(this.variable);
+        writer.writeArrayExpression(this.variable, from, to, body);
+        writer.endArrayExpression(this.variable);
+    }
+}
+
 export class ConstantNode implements NamedNode {
     public METADATA = {
         value: "expression",
@@ -69,11 +112,28 @@ export class ConstantNode implements NamedNode {
     }
 }
 
+export class PeriodicWaveNode implements NamedNode {
+    public METADATA = {
+        real: "array",
+        img: "array",
+    };
+
+    public name: string;
+    public real: any;
+    public img: any;
+    public anonymous: boolean = true;
+
+    public generateCode(writer: JavascriptWriter) {
+        writer.writeGeneratePeriodicWave(this.name, this.real, this.img);
+    }
+}
+
 export class OscillatorNode implements NamedNode {
     public METADATA = {
         detune: "expression",
         frequency: "expression",
         type: "string",
+        periodicWave: "expression",
     };
 
     public detune: number = null;
@@ -82,12 +142,18 @@ export class OscillatorNode implements NamedNode {
     public name: string = null;
     public type: string = "sine";
     public anonymous: boolean = true;
+    public periodicWave: any;
 
     public generateCode(jswriter: JavascriptWriter): void {
-        const name = jswriter.writeDefinition("OscillatorNode", this.name);
+        const name = jswriter.writeDefinition("createOscillator", this.name);
         jswriter.writeGenericProperty(name, "detune", this.detune);
         jswriter.writeGenericProperty(name, "frequency", this.frequency);
         jswriter.writeStringProperty(name, "type", this.type, true);
+
+        if (this.periodicWave) {
+            jswriter.writeSetPeriodicWave(this.name, this.periodicWave);
+        }
+
         jswriter.writeStartNode(name);
         if (this.exported && !this.anonymous) {
             jswriter.writeGetterSetter(name, "detune");

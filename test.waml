@@ -1,8 +1,10 @@
-Constant frequency {
-  value: (2*@sin(@cos(5)))+1
+PeriodicWave wave {
+  real: [x, 1 to 10, x * (x-1)],
+  img: [1,2,3]
 }
 
 Oscillator a {
-  frequency: 2*frequency*@pi,
-  type: "sine"
+  frequency: 440,
+  type: "sine",
+  periodicWave: wave
 } export
